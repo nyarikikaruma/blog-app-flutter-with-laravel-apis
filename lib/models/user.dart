@@ -1,11 +1,11 @@
 class User {
-  String? id;
-  String? name;
-  String? email;
-  String? image;
-  String? token;
+  final int? id;
+  final String? name;
+  final String? email;
+  final String? image;
+  final String? token;
 
-  User({
+  const User({
     this.email,
     this.id,
     this.image,
@@ -16,10 +16,11 @@ class User {
   /// Convert json data to user model data
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-        id: json['user']['id'],
-        image: json['user']['image'],
-        name: json['user']['name'],
-        email: json['user']['email'],
-        token: json['token']);
+      id: json['user']['id'],
+      image: json['user']['image'],
+      name: json['user']['name'],
+      email: json['user']['email'],
+      token: json['token'],
+    );
   }
 }

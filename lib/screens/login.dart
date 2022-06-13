@@ -1,6 +1,7 @@
 import 'package:blogapp/constants.dart';
 import 'package:blogapp/models/api_response.dart';
 import 'package:blogapp/models/user.dart';
+import 'package:blogapp/screens/home.dart';
 import 'package:blogapp/screens/register.dart';
 import 'package:blogapp/services/user_service.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,9 @@ class _LoginState extends State<Login> {
   void _saveAndRedirectToHome(User user) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.setString('token', user.token.toString());
-    await preferences.setString('userId', user.id.toString());
+    await preferences.setInt('userId', user.id ?? 0);
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: ((context) => Home())), (route) => false);
   }
 
   @override
@@ -79,7 +82,7 @@ class _LoginState extends State<Login> {
                         onPressed: () {
                           if (formkey.currentState!.validate()) {
                             setState(() {
-                              loading = true;
+                              // loading = true;
                               _loginUser();
                             });
                           }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:blogapp/constants.dart';
 import 'package:blogapp/models/api_response.dart';
 import 'package:blogapp/models/user.dart';
@@ -16,7 +18,7 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   final GlobalKey<FormState> formkey = GlobalKey();
-  bool loading = false;
+  bool loading = true;
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -25,7 +27,11 @@ class _RegisterState extends State<Register> {
   void _registerUser() async {
     APIResponse response = await register(
         nameController.text, emailController.text, passwordController.text);
+    print(response.error);
     if (response.error == null) {
+      setState(() {
+        loading = !loading;
+      });
       _saveAndRedirectToHome(response.data as User);
     } else {
       setState(() {
@@ -38,12 +44,12 @@ class _RegisterState extends State<Register> {
   }
 
   void _saveAndRedirectToHome(User user) async {
+    print(user.token);
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.setString('token', user.token ?? '');
-    await preferences.setString('userId', user.id ?? '');
+    await preferences.setInt('userId', user.id ?? 0);
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: ((context) => const Home())),
-        (route) => false);
+        MaterialPageRoute(builder: ((context) => Home())), (route) => false);
   }
 
   @override
@@ -95,28 +101,28 @@ class _RegisterState extends State<Register> {
                 const SizedBox(
                   height: 20,
                 ),
-                loading
-                    ? const Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : ElevatedButton(
-                        onPressed: () {
-                          if (formkey.currentState!.validate()) {
-                            setState(() {
-                              loading = !loading;
-                              _registerUser();
-                            });
-                          }
-                        },
-                        child: const Text('Submit'),
-                      ),
+                // loading
+                //     ? const Center(
+                //         child: CircularProgressIndicator(),
+                //       )
+                ElevatedButton(
+                  onPressed: () {
+                    if (formkey.currentState!.validate()) {
+                      setState(() {
+                        // loading = !loading;
+                        _registerUser();
+                      });
+                    }
+                  },
+                  child: const Text('Submit'),
+                ),
                 const SizedBox(
                   height: 20,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Already have a account '),
+                    const Text('Already have an account '),
                     GestureDetector(
                       child: const Text(
                         'Login',

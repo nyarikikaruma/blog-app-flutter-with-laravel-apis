@@ -4,6 +4,7 @@ import 'package:blogapp/screens/home.dart';
 import 'package:blogapp/screens/login.dart';
 import 'package:blogapp/services/user_service.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Loading extends StatefulWidget {
   const Loading({Key? key}) : super(key: key);
@@ -23,13 +24,14 @@ class _LoadingState extends State<Loading> {
           (route) => false);
     } else {
       APIResponse response = await getUserDetails();
+      print(response.error);
       if (response.error == null) {
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-              builder: (context) => const Home(),
+              builder: (context) => Home(),
             ),
             (route) => false);
-      } else if (response == unAuthorized) {
+      } else if (response.error == unAuthorized) {
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (context) => const Login(),
@@ -45,6 +47,8 @@ class _LoadingState extends State<Loading> {
 
   @override
   void initState() {
+    // SharedPreferences preferences = await SharedPreferences.getInstance();
+    // await preferences.clear();
     _loadUserInfo();
     super.initState();
   }
