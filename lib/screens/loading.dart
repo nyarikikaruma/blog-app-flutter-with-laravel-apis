@@ -4,7 +4,6 @@ import 'package:blogapp/screens/home.dart';
 import 'package:blogapp/screens/login.dart';
 import 'package:blogapp/services/user_service.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Loading extends StatefulWidget {
   const Loading({Key? key}) : super(key: key);
@@ -24,6 +23,7 @@ class _LoadingState extends State<Loading> {
           (route) => false);
     } else {
       APIResponse response = await getUserDetails();
+      print(response);
       print(response.error);
       if (response.error == null) {
         Navigator.of(context).pushAndRemoveUntil(

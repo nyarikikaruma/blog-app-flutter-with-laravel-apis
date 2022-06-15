@@ -1,4 +1,11 @@
+import 'dart:developer';
 import 'dart:io';
+import 'package:blogapp/constants.dart';
+import 'package:blogapp/models/api_response.dart';
+import 'package:blogapp/screens/login.dart';
+import 'package:blogapp/services/post_service.dart';
+import 'package:blogapp/services/user_service.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -15,11 +22,41 @@ class _PostFormState extends State<PostForm> {
   bool _loading = false;
   File? _imageFile;
   final _picker = ImagePicker();
+  PlatformFile? file;
 
+  // Future getImage() async {
+  //   final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+  //   if (pickedFile != null) {
+  //     _imageFile = File(pickedFile.path);
+  //   }
+  // }
   Future getImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      _imageFile = File(pickedFile.path);
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      _imageFile = File(result.files.single.path!);
+      file = result.files.first;
+    }
+  }
+
+  void _createPost() async {
+    PlatformFile? image = file == null ? null : file!;
+    log(image!.toString());
+    APIResponse response = await createPost(_textControllerBody.text, image);
+    if (response.error == null) {
+      Navigator.of(context).pop();
+    } else if (response.error == unAuthorized) {
+      logout().then((value) => {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const Login()),
+                (route) => false)
+          });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('${response.error}'),
+      ));
+      setState(() {
+        _loading = !_loading;
+      });
     }
   }
 
@@ -59,8 +96,8 @@ class _PostFormState extends State<PostForm> {
                       size: 50,
                       color: Colors.black,
                     ),
-                    onPressed: () {
-                      getImage();
+                    onPressed: () async {
+                      await getImage();
                     },
                   ),
                 ),
@@ -94,6 +131,7 @@ class _PostFormState extends State<PostForm> {
                       if (formkey.currentState!.validate()) {
                         setState(() {
                           _loading = !_loading;
+                          _createPost();
                         });
                       }
                     },

@@ -27,7 +27,6 @@ class _RegisterState extends State<Register> {
   void _registerUser() async {
     APIResponse response = await register(
         nameController.text, emailController.text, passwordController.text);
-    print(response.error);
     if (response.error == null) {
       setState(() {
         loading = !loading;
@@ -44,7 +43,6 @@ class _RegisterState extends State<Register> {
   }
 
   void _saveAndRedirectToHome(User user) async {
-    print(user.token);
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.setString('token', user.token ?? '');
     await preferences.setInt('userId', user.id ?? 0);
